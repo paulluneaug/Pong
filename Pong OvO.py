@@ -1,6 +1,6 @@
 import tkinter as tk
-from random import randint,choice
-from math import cos,sin,sqrt
+from random import randint
+from math import cos,sin,sqrt,pi
 
 def play_pong_JvJ():
     """
@@ -34,11 +34,11 @@ def play_pong_JvJ():
     fra_pts2.grid(column=1,row=0)
     fra_pts2.pack_propagate(False)
 
-    lab_pts_p1=tk.Label(fra_pts1,font='System 30',fg='white',bg='black',
+    lab_pts_p1=tk.Label(fra_pts1,font='System 30',fg='#6699FF',bg='black',
         text='0')
     lab_pts_p1.pack(pady=15)
 
-    lab_pts_p2=tk.Label(fra_pts2,font='System 30',fg='white',bg='black',
+    lab_pts_p2=tk.Label(fra_pts2,font='System 30',fg='#FF6633',bg='black',
         text='0')
     lab_pts_p2.pack(pady=15)
 
@@ -77,16 +77,20 @@ def init():
     can_maj(True,True)
     f_play()
 
+
 def new_ball():
     """
-    Place une nouvelle balle au centre du canevas et lui attribue un nouveau
+    Place une nouvelle balle au centre du canevaset lui attribue un nouveau
     vecteur
     """
-    global ball,vect_ball
+    global ball,vect_ball,ball_color
     default_ball_speed=5 #Norme du vecteur qui guide la balle lors de sa création
     ball=[x_can//2,y_can//2] #Coordonnées de la balle
     angle=deg2rad(randint(-45,45)+180*randint(0,1)) #Angle selon lequel la balle part
-
+    if -pi/2<angle<pi/2:
+        ball_color='#6699FF'
+    else:
+        ball_color='#FF6633'
     #Coordonnées du vecteur que suit la balle
     vect_ball=[cos(angle)*default_ball_speed,sin(angle)*default_ball_speed]
 
@@ -109,17 +113,17 @@ def can_maj(move_p1,move_p2):
     #Supprime la balle du canevas puis la redessine à la bonne place
     can.delete("ball")
     can.create_oval(ball[0]-c_ball,ball[1]-c_ball,ball[0]+c_ball,
-        ball[1]+c_ball,fill='white',tag="ball")
+        ball[1]+c_ball,fill=ball_color,tag="ball")
 
     if move_p1:             #Si la première barre doit bouger, la supprime et
         can.delete("bar1")  #la redessine au bon endroit
         can.create_rectangle(bar_p1[0]-barx,bar_p1[1]-bary,bar_p1[0]+barx,
-            bar_p1[1]+bary,fill='white',tag="bar1")
+            bar_p1[1]+bary,fill='#6699FF',tag="bar1")
 
     if move_p2:             #Si la première barre doit bouger, la supprime et
         can.delete("bar2")  #la redessine au bon endroit
         can.create_rectangle(bar_p2[0]-barx,bar_p2[1]-bary,bar_p2[0]+barx,
-            bar_p2[1]+bary,fill='white',tag="bar2")
+            bar_p2[1]+bary,fill='#FF6633',tag="bar2")
 
 
 def up_p1(event):
@@ -159,7 +163,7 @@ def f_play():
     Fonction qui gère le déplacement de tous les éléments
     """
     global ball,vect_ball,fen,c_ball,bar_p1,bar_p2,barx,bary,lab_pts_p1
-    global pts_p1,pts_p2,lab_pts_p2
+    global pts_p1,pts_p2,lab_pts_p2,ball_color
     ball=[ball[0]+vect_ball[0],ball[1]+vect_ball[1]]
     max_speed=12 #Vitesse maximum de la balle
 
@@ -201,6 +205,7 @@ def f_play():
             mult*=1.05
         mult/=sqrt((xc-xp)**2+(yc-yp)**2) # Calcul de CP
         vect_ball=[(xc-xp)*mult,(yc-yp)*mult] #Mise à jour des coordonnées du vecteur qui guide la balle
+        ball_color='#6699FF'
 
     elif bar_p2[1]-bary-c_ball<=ball[1]<=bar_p2[1]+bary+c_ball and ball[0]+c_ball>=bar_p2[0]-barx:
         #On vérifie si la balle ne nouche pas la barre de droite
@@ -211,7 +216,8 @@ def f_play():
             mult*=1.05
         mult/=sqrt((xc-xp)**2+(yc-yp)**2) # Calcul de CP
         vect_ball=[(xc-xp)*mult,(yc-yp)*mult] #Mise à jour des coordonnées du vecteur qui guide la balle
-
+        ball_color='#FF6633'
+        
     if 0>=ball[0]:#Vérifie si la balle est passée derrière la barre de gauche
         pts_p2+=1 #Ajoute un point au joueur
         lab_pts_p2.configure(text=str(pts_p2))
